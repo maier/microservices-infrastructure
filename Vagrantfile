@@ -36,7 +36,16 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "ansible" do |ansible|
-    ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
+    ansible.extra_vars = {
+        "ansible_ssh_user" => "vagrant",
+        "consul_dc" => "vagrant",
+        "consul_acl_datacenter" => "vagrant",
+        "consul_bootstrap_expect" => 1,
+        "mesos_cluster" => "vagrant",
+        "mesos_mode" => "mixed",
+        "nginx_admin_password" => "vagrant",
+        "marathon_http_credentials" => "admin:vagrant"
+    }.merge(load_security)
     ansible.playbook = "vagrant.yml"
     ansible.groups = {
       "consul_servers" => ["default"],
@@ -44,15 +53,6 @@ Vagrant.configure(2) do |config|
       "vagrant" => ["default"],
       "zookeeper_servers" => ["default"]
     }
-    ansible.extra_vars = load_security.merge({
-      "consul_dc" => "vagrant",
-      "consul_acl_datacenter" => "vagrant",
-      "consul_bootstrap_expect" => 1,
-      "mesos_cluster" => "vagrant",
-      "mesos_mode" => "mixed",
-      "nginx_admin_password" => "vagrant",
-      "marathon_http_credentials" => "admin:vagrant"
-    })
   end
 
   config.vm.provider :virtualbox do |vb|
